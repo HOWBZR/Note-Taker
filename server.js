@@ -3,32 +3,30 @@ const path = require("path");
 const fs = require('fs')
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static('public'))
+app.use(express.static('public'));
 
+const PORT = process.env.PORT || 3000;
 
 
 // Basic route that sends the users to index and notes pages
 app.get("/", function (req, res) {
-    res.sendFile(path.join(__dirname, "./Develop/public/index.html"));
+    res.sendFile(path.join(__dirname, "Develop/public/index.html"));
 });
 
 
 
 app.get("/notes", function (req, res) {
-    res.sendFile(path.join(__dirname, "./Develop/public/notes.html"));
+    res.sendFile(path.join(__dirname, "Develop/public/notes.html"));
 });
 
 
-
-
-let notes = [];
+let notes = []
 
 app.get("/api/notes", function (req, res) {
-    fs.readFile('/Develop/db/db.json', 'utf8', function (err, data) {
+    fs.readFile('/Develop/db/db.json', function (err, data) {
 
         notes = JSON.parse(data)
         console.log(notes)
@@ -46,10 +44,11 @@ app.post("/api/notes", function (req, res) {
     if (notes.length !== 0) {
         id = notes[notes.length].id + 1
     }
+    newNote = { id, ...newNote }
     notes.push(newNote);
 
 
-    fs.writeFile('./Develop/db/db.json', JSON.stringify(notes), (err) => {
+    fs.writeFile('/Develop/db/db.json', JSON.stringify(notes), (err) => {
         if (err) throw err;
         console.log('Your file was written')
         res.json(newNote)
@@ -62,12 +61,12 @@ app.delete('/api/notes/:id', function (req, res) {
     let temp = notes.filter(elem => elem.id !== id)
     notes = temp
 
-    fs.writeFile('./Develop/db/db.json', JSON.stringify(notes), (err) => {
+    fs.writeFile('/Develop/db/db.json', JSON.stringify(notes), (err) => {
         console.log('Youre file has been written!')
 
         res.json(notes)
     })
-})
+});
 
 app.put('/api/notes/:id', function (req, res) {
     let id = parseInt(req.params.id)
